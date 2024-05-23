@@ -30,17 +30,20 @@
             
               </div>
               <div class="input-group input-group-merge">
-                <input type="password" id="password" v-model="password" class="form-control" name="password" placeholder="············" aria-describedby="password">
-                <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                <input :type="sh_pw" id="password" v-model="password" @keyup.enter="Login()" class="form-control" name="password" placeholder="············" aria-describedby="password">
+                <span class="input-group-text cursor-pointer" @click="sh_pw=='password'?sh_pw='text':sh_pw='password'" >
+                  <i class="bx bx-hide" v-if="sh_pw=='password'"></i>
+                  <i class="bx bx-show"  v-if="sh_pw=='text'"></i>
+                </span>
               </div>
             </div>
 
-            <div class="alert alert-warning" role="alert" v-if="text_error">
-              {{text_error}}
+            <div class="alert alert-warning" role="alert" v-if="text_error || text_error_email || text_error_pass">
+              {{text_error}} {{text_error_email}} {{text_error_pass}}
           </div>
           
             <div class="mb-3">
-              <button class="btn btn-primary d-grid w-100" @click="Login()" type="submit">ເຂົ້າສູ່ລະບົບ</button>
+              <button class="btn btn-primary d-grid w-100" :disabled="check_from_login" @click="Login()" type="submit">ເຂົ້າສູ່ລະບົບ</button>
             </div>
          
 
@@ -58,6 +61,16 @@
 </div>
 </template>
 <script>
+// if else ແບບຫຍໍ້
+// sh_pw=='password'?sh_pw='text':sh_pw='password'
+
+// ອະທິບາຍ ເງື່ອນໄຂ if else ແບບເຕົມ
+// if(sh_pw=='password'){
+//   sh_pw='text'
+// } else {
+//   sh_pw='password'
+// }
+
 import axios from 'axios';
 export default {
     data() {
@@ -65,6 +78,43 @@ export default {
         email:'',
         password:'',
         text_error:'',
+        text_error_email:'',
+        text_error_pass:'',
+        sh_pw:'password',
+      }
+    },
+    computed:{
+      check_from_login(){
+          // ກວດ ອີເມວລ໌
+          const EmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+          if(this.email){
+            if(EmailRegex.test(this.email)){
+              this.text_error_email = ""
+            } else {
+              this.text_error_email = "ອີເມວລ໌ບໍ່ຖຶກຕ້ອງ"
+            }
+          } else {
+            this.text_error_email = ""
+          }
+
+          /// ກວດລະຫັດຜ່ານ
+          if(this.password){
+            if(this.password.length<=3){
+              this.text_error_pass = " ລະຫັດຜ່ານຕ້ອງຫຼາຍກ່ວາ 4 ຕົວອັກສອນ"
+            } else {
+              this.text_error_pass = ""
+            }
+          } else {
+            this.text_error_pass = ""
+          }
+
+          // ກວດຄວາມຖຶກຕ້ອງ, ປິດປຸ່ມ
+          if(!EmailRegex.test(this.email) || this.password.length<=3){
+            return true
+          } else {
+            return false
+          }
       }
     },
     methods:{
@@ -75,11 +125,17 @@ export default {
                 login_password: this.password
               }).then((res)=>{
 
-                if(res.data.succes){
+                if(res.data.success){
                   this.text_error = ''
 
                   this.email = ''
                   this.password = ''
+
+                  // ບັນທຶກ Token ແລະ ຂໍ້ມູນ User
+                  localStorage.setItem('web_token',res.data.token)
+                  localStorage.setItem('web_user',JSON.stringify(res.data.user_data))
+
+                  this.$router.push('/')
 
                   console.log(res)
 

@@ -74,4 +74,24 @@ class UserController extends Controller
         return response()->json($response);
 
     }
+
+    public function logout(){
+
+        $token = JWTAuth::getToken();
+        $invalidate = JWTAuth::invalidate($token);
+        if($invalidate){
+            $response = [
+                'success' => true,
+                'message' => 'ສຳເລັດ!'
+            ];
+        } else {
+            $response = [
+                'success' => false,
+                'message' => 'ບໍ່ສຳເລັດ!'
+            ];
+        }
+
+        return response()->json($response);
+
+    }
 }
