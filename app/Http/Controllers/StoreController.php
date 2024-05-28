@@ -19,8 +19,15 @@ class StoreController extends Controller
 
         $sort = \Request::get('sort');
         $perpage = \Request::get('perpage');
+        $search = \Request::get('search');
 
         $store = Store::orderBy('id',$sort)
+        ->where(
+            function($query) use ($search){
+                $query->where('name','LIKE',"%{$search}%")
+                ->orWhere('price_buy','LIKE',"%{$search}%");
+            }
+        )
         ->paginate($perpage)
         ->toArray();
 
