@@ -10,7 +10,15 @@
             <button type="button" class="btn btn-danger" @click="CancelStore()">ຍົກເລີກ</button>
         </div>
         <div class="row">
-            <div class="col-md-4">img</div>
+            <div class="col-md-4 text-center" style="position: relative;">
+
+                <button type="button" @click="RemoveImg()" class=" imp-pro btn rounded-pill btn-icon btn-danger" v-if="FormStore.image">
+                    <i class='bx bx-x-circle fs-4'></i>
+              </button>
+
+                <img :src="imagePreview" @click="$refs.img_store.click()" class=" cursor-pointer rounded" style="width:60%" >
+                <input type="file" ref="img_store" style=" display:none" @change="onSelect" >
+            </div>
             <div class="col-md-8">
                 <div>
 
@@ -59,8 +67,8 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>ຮູບ</th>
+            <th width="80">ID</th>
+            <th width="120">ຮູບ</th>
             <th>ຊື່ສິນຄ້າ</th>
             <th class="text-center">ລາຄາຊື້</th>
             <th class="text-center">ຈັດການ</th>
@@ -69,7 +77,10 @@
         <tbody>
           <tr v-for="list in StoreData.data" :key="list.id">
             <td> {{ list.id }} </td>
-            <td> {{ list.image }} </td>
+            <td class="text-center"> 
+                <img :src="url + '/assets/img/' + list.image" v-if="list.image" class=" rounded" style="width:60px" >
+                <img :src="url + '/assets/img/no_img.jpg'" v-else class=" rounded" style="width:60px" >
+            </td>
             <td>
              {{ list.name }}
             </td>
@@ -106,6 +117,8 @@ export default {
     },
     data() {
         return {
+            url: window.location.origin,
+            imagePreview: window.location.origin + '/assets/img/upload-img.png',
             StoreData:[],
             FormStore:{
                 name:'',
@@ -142,6 +155,19 @@ export default {
         }
     },
     methods:{
+        RemoveImg(){
+            this.FormStore.image = ''
+            this.imagePreview = window.location.origin + '/assets/img/upload-img.png'
+        },
+        onSelect(envent){
+            // console.log(envent)
+            this.FormStore.image = envent.target.files[0]
+            let reader = new FileReader()
+            reader.readAsDataURL(this.FormStore.image)
+            reader.addEventListener("load", function(){
+                this.imagePreview = reader.result
+            }.bind(this,false))
+        },
         showAlert() {
         // Use sweetalert2
         this.$swal({
@@ -171,6 +197,7 @@ export default {
             this.FormStore.qty = ""
             this.FormStore.price_buy = ""
             this.FormStore.price_sell = ""
+            this.imagePreview = this.url + '/assets/img/upload-img.png'
         },
         EditStore(id){
             this.FormType = false
@@ -183,6 +210,11 @@ export default {
                 // console.log(res.data)
                 this.FormStore = res.data
                 this.ShowForm = true
+                if(res.data.image){
+                    this.imagePreview = this.url + '/assets/img/' + res.data.image
+                } else {
+                    this.imagePreview = this.url + '/assets/img/no_img.jpg'
+                }
 
             }).catch((error)=>{
                 console.log(error)
@@ -255,7 +287,7 @@ export default {
         SaveStore(){
                 if(this.FormType){
                     // add 
-                    axios.post('api/store/add',this.FormStore, { headers:{ Authorization:'Bearer '+ this.store.get_token }}).then((res)=>{
+                    axios.post('api/store/add',this.FormStore, { headers:{ "Content-Type":"multipart/form-data" , Authorization:'Bearer '+ this.store.get_token }}).then((res)=>{
                         if(res.data.success){
 
                             this.ShowForm = false
@@ -295,7 +327,7 @@ export default {
 
                 } else {
                     // update
-                    axios.post(`api/store/update/${this.EditID}`,this.FormStore, { headers:{ Authorization:'Bearer '+ this.store.get_token }}).then((res)=>{
+                    axios.post(`api/store/update/${this.EditID}`,this.FormStore, { headers:{ "Content-Type":"multipart/form-data" , Authorization:'Bearer '+ this.store.get_token }}).then((res)=>{
                         if(res.data.success){
 
                                 this.ShowForm = false
@@ -363,6 +395,10 @@ export default {
     }
 }
 </script>
-<style lang="">
-    
+<style >
+    .imp-pro{
+        position: absolute;
+        top: 0px;
+        right: 10px;
+    }
 </style>
