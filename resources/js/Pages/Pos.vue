@@ -3,7 +3,7 @@
         <div class="col-md-8">
             <div class="card mb-3" >
                 <div class="card-body">
-                    <input class=" form-control" placeholder="ຄົ້ນຫາ....">
+                    <input class=" form-control" placeholder="ຄົ້ນຫາ...." v-model="Search" @keyup.enter="GetStore()">
                 </div>
             </div>
             <PerfectScrollbar>
@@ -195,6 +195,14 @@ export default {
             }
     },
     methods:{
+
+        async openLink(link){
+            const response = await fetch(`${link}`,{ headers:{ Authorization: 'Bearer '+ this.store.get_token}});
+            const html = await response.text();
+            const blob = new Blob([html],{ type: "text/html"});
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, "_blank");
+        },
         ConfirmPay(){
 
             axios.post('api/transection/add',{
@@ -204,7 +212,13 @@ export default {
             },{ headers:{ Authorization:'Bearer '+ this.store.get_token }}).then((res)=>{
                     if(res.data.success){
 
-                        
+                        this.customer_name = ""
+                        this.customer_tel = ""
+                        this.ListOrder = []
+                        this.CashAmount = 0
+                        this.GetStore()
+
+                        $('#dialog_pay').modal('hide')
 
                         this.$swal({
                                 position:'top-end',
@@ -214,6 +228,11 @@ export default {
                                 icon:"success",
                                 timer:2500
                             });
+
+                        console.log(res.data.bill_id)
+
+                        // window.open(window.location.origin+"/api/bills/print/"+res.data.bill_id, "_blank")
+                        this.openLink(window.location.origin+"/api/bills/print/"+res.data.bill_id)
 
                     } else {
                         this.$swal({
@@ -330,6 +349,13 @@ export default {
     created() {
         this.GetStore()
     },
+    watch:{
+        Search(){
+            if(this.Search == ""){
+                this.GetStore()
+            }
+        }
+    }
 }
 </script>
 <style >
