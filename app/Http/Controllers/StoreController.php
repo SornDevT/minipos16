@@ -89,7 +89,7 @@ class StoreController extends Controller
 
              $tran = new Transection([
                  "tran_id" => "EXP".$number,
-                 "tran_type" => "expens",
+                 "tran_type" => "expense",
                  "product_id"=>$product_id,
                  "qty"=> $request->qty,
                  "price"=> $request->qty*$request->price_buy,
