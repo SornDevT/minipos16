@@ -1,6 +1,9 @@
 <template lang="">
+
+<dashgrap />
+
     <div class="card">
-  <h5 class="card-header">Bordered Table</h5>
+  <h5 class="card-header">ການເຄື່ອນໄຫວ ທຸລະກຳ</h5>
   <div class="card-body">
     <div class="table-responsive text-nowrap">
         <div class=" d-flex justify-content-between mb-2">

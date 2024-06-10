@@ -50,4 +50,5 @@ Route::controller(BillController::class)->group(function(){
 
 Route::controller(ReportController::class)->group(function(){
     Route::post('report','created_report');
+    Route::get('report/dashgrap','dashgrap');
 });

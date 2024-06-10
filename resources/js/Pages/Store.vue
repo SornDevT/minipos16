@@ -1,10 +1,13 @@
 <template lang="">
+
+    <dashgrap />
+
     <div class="card">
   <h5 class="card-header">ລາຍການສິນຄ້າ</h5>
   <div class="card-body">
 
     <div v-if="ShowForm">
-        {{FormStore}}
+        <!-- {{FormStore}} -->
         <div class=" d-flex justify-content-end">
             <button type="button" class="btn btn-success me-2" :disabled="CheckForm" @click="SaveStore()">ບັນທຶກ</button>
             <button type="button" class="btn btn-danger" @click="CancelStore()">ຍົກເລີກ</button>
@@ -99,7 +102,7 @@
           
         </tbody>
       </table>
-      <button @click="showAlert">Hello world</button>
+      <!-- <button @click="showAlert">Hello world</button> -->
 
       <Pagination :pagination="StoreData" :offset="4" @paginate="GetStore($event)" />
 
